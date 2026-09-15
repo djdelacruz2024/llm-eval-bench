@@ -1,0 +1,37 @@
+# Live demo config: both the models-under-test and the judge are real
+# Claude models via the Anthropic API (used here because Ollama isn't
+# available in this sandboxed environment — see config.example.yaml for
+# the intended free/local setup).
+#
+# Pricing used for cost tracking ($/1M -> $/1K tokens, Anthropic first-party rates):
+#   Claude Haiku 4.5 (claude-haiku-4-5): $1 / $5 per 1M   -> $0.001 / $0.005 per 1K
+#   Claude Sonnet 5  (claude-sonnet-5):  $2 / $10 per 1M  -> $0.002 / $0.01 per 1K
+
+models:
+  - name: claude-haiku-4-5
+    provider: anthropic
+    model_id: claude-haiku-4-5
+    cost_per_1k_prompt_tokens: 0.001
+    cost_per_1k_completion_tokens: 0.005
+    # no `effort` — Haiku 4.5 doesn't support output_config.effort (400s if set)
+    max_tokens: 1024
+
+  - name: claude-sonnet-5
+    provider: anthropic
+    model_id: claude-sonnet-5
+    cost_per_1k_prompt_tokens: 0.002
+    cost_per_1k_completion_tokens: 0.01
+    effort: low
+    max_tokens: 1024
+
+judge:
+  name: claude-sonnet-5-judge
+  provider: anthropic
+  model_id: claude-sonnet-5
+  cost_per_1k_prompt_tokens: 0.002
+  cost_per_1k_completion_tokens: 0.01
+  effort: low
+  max_tokens: 1024
+
+dataset_path: data/golden_dataset.json
+no_rag_dataset_path: data/no_rag_rules.json

@@ -26,14 +26,14 @@ class AnthropicProvider(ModelProvider):
         model_id: str = "claude-sonnet-5",
         api_key_env: str = "ANTHROPIC_API_KEY",
         max_tokens: int = 2048,
-        effort: str = "low",
+        effort: str | None = None,
     ):
         super().__init__(name, model_id)
         self.api_key_env = api_key_env
         self.max_tokens = max_tokens
-        # A judge grading a short rubric is closer to classification than
-        # hard reasoning, so "low" effort keeps cost/latency down; raise it
-        # via provider_kwargs in the config if judge quality looks noisy.
+        # `effort` is only accepted by some models (e.g. Sonnet 5, Opus 5) and
+        # is rejected with a 400 on others (e.g. Haiku 4.5) — omit it unless
+        # explicitly set via the config, rather than guessing per model_id.
         self.effort = effort
         self._client = None
 
@@ -60,14 +60,18 @@ class AnthropicProvider(ModelProvider):
     def generate(self, prompt: str, system: str | None = None) -> GenerationResult:
         client = self._get_client()
 
+        kwargs = {}
+        if self.effort is not None:
+            kwargs["output_config"] = {"effort": self.effort}
+
         start = time.perf_counter()
         try:
             response = client.messages.create(
                 model=self.model_id,
                 max_tokens=self.max_tokens,
                 system=system or "",
-                output_config={"effort": self.effort},
                 messages=[{"role": "user", "content": prompt}],
+                **kwargs,
             )
         except Exception as exc:  # anthropic raises a typed exception hierarchy
             raise ProviderError(

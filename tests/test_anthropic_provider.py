@@ -15,7 +15,7 @@ def test_anthropic_provider_requires_api_key(monkeypatch):
 def test_anthropic_provider_defaults():
     provider = AnthropicProvider(name="judge")
     assert provider.model_id == "claude-sonnet-5"
-    assert provider.effort == "low"
+    assert provider.effort is None
     assert provider.max_tokens == 2048
 
 
