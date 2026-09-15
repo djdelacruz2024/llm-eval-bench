@@ -16,12 +16,13 @@ from .metrics import compute_cost_usd, score_no_rag_compliance
 from .storage import ResultRow, connect, create_run, insert_result
 
 NO_RAG_SYSTEM_PROMPT = (
-    "You are a helpful health-plan member support assistant. No reference "
-    "documents were retrieved for this question. Answer from your general "
-    "knowledge where appropriate, but be honest about what you don't or "
-    "can't know — such as real-time, account-specific, or diagnostic "
-    "information you have no access to. Never invent specifics you cannot "
-    "verify, and never give a definitive medical directive."
+    "You are a helpful customer support and general-knowledge assistant. No "
+    "reference documents were retrieved for this question. Answer from your "
+    "general knowledge where appropriate, but be honest about what you don't "
+    "or can't know — such as real-time, account-specific information you "
+    "have no access to, or actions you cannot actually perform. Never invent "
+    "specifics you cannot verify, and never recommend a drastic, hard-to-reverse "
+    "action without warning about the consequences first."
 )
 
 

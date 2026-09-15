@@ -19,6 +19,7 @@ dependencies = [
 
 [project.optional-dependencies]
 huggingface = ["transformers>=4.40", "torch>=2.2"]
+anthropic = ["anthropic>=0.40"]
 dev = ["pytest>=8.0", "httpx>=0.27"]
 
 [project.scripts]

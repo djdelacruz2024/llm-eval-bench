@@ -1,146 +1,146 @@
 [
   {
     "id": "g01",
-    "category": "preventive_care",
-    "question": "How often should a healthy adult with no risk factors get their blood pressure checked?",
-    "reference_answer": "At least once every two years for adults with normal blood pressure, and once a year if blood pressure is elevated or risk factors are present.",
+    "category": "general_knowledge_science",
+    "question": "What is the boiling point of water at sea level, in Celsius?",
+    "reference_answer": "Water boils at 100 degrees Celsius (212 degrees Fahrenheit) at standard atmospheric pressure (sea level).",
     "context": [
-      "Member Wellness Guide, Section 3.1: Adults aged 18+ with blood pressure below 120/80 mmHg should be screened at least every two years. Individuals with elevated readings (120-129 systolic) or additional risk factors should be screened annually."
+      "Physical Science Reference: At standard atmospheric pressure (1 atm, roughly sea level), pure water boils at 100°C / 212°F. Boiling point decreases at higher altitudes due to lower atmospheric pressure."
     ]
   },
   {
     "id": "g02",
-    "category": "preventive_care",
-    "question": "What is the recommended age to begin routine colorectal cancer screening for average-risk adults?",
-    "reference_answer": "Routine colorectal cancer screening is recommended starting at age 45 for adults at average risk.",
+    "category": "general_knowledge_geography",
+    "question": "What is the capital city of Australia?",
+    "reference_answer": "Canberra is the capital of Australia. It is commonly and incorrectly assumed to be Sydney, which is Australia's largest city but not its capital.",
     "context": [
-      "Preventive Screening Bulletin: Average-risk adults should begin colorectal cancer screening at age 45, per updated national guidelines. Individuals with a family history or other risk factors may need to start earlier."
+      "Geography Reference: Canberra, located in the Australian Capital Territory, is the capital city of Australia. Sydney, despite being the country's largest and most well-known city, has never been the capital."
     ]
   },
   {
     "id": "g03",
-    "category": "medication_safety",
-    "question": "Is it safe to take ibuprofen and acetaminophen at the same time?",
-    "reference_answer": "Yes, ibuprofen and acetaminophen work differently in the body and can generally be taken together or alternated, as long as each is dosed within its own recommended limits. Patients should check with a pharmacist or doctor if they have kidney, liver, or stomach conditions.",
+    "category": "general_knowledge_history",
+    "question": "In what year did World War II end?",
+    "reference_answer": "World War II ended in 1945, with Germany surrendering in May 1945 and Japan surrendering in September 1945.",
     "context": [
-      "Medication Safety Sheet: Ibuprofen (an NSAID) and acetaminophen act through different mechanisms and are commonly alternated or combined for pain relief in adults without contraindications. Always follow label dosing limits for each medication separately."
+      "History Reference: World War II concluded in 1945. Victory in Europe (V-E Day) was declared on May 8, 1945, and Japan formally surrendered on September 2, 1945, marking the end of the war."
     ]
   },
   {
     "id": "g04",
-    "category": "nutrition",
-    "question": "How much added sugar is recommended per day for adults?",
-    "reference_answer": "Major dietary guidelines recommend limiting added sugar to less than 10% of total daily calories, roughly 50 grams or less on a 2,000-calorie diet.",
+    "category": "general_knowledge_technology",
+    "question": "What does the acronym 'HTTP' stand for?",
+    "reference_answer": "HTTP stands for HyperText Transfer Protocol, the protocol used for transmitting web pages over the internet.",
     "context": [
-      "Nutrition Education Handout: Added sugars should make up less than 10% of total daily calories. For a 2,000-calorie diet, this is about 50 grams (12 teaspoons) or less per day."
+      "Technology Reference: HTTP (HyperText Transfer Protocol) is the foundational protocol for data communication on the World Wide Web, defining how messages are formatted and transmitted between browsers and servers."
     ]
   },
   {
     "id": "g05",
-    "category": "mental_health",
-    "question": "What are common early signs of burnout?",
-    "reference_answer": "Common early signs include persistent fatigue, irritability, reduced motivation, difficulty concentrating, and feeling detached from work or responsibilities.",
+    "category": "general_knowledge_science",
+    "question": "Which planet in our solar system is known as the 'Red Planet'?",
+    "reference_answer": "Mars is known as the Red Planet, due to iron oxide (rust) on its surface giving it a reddish appearance.",
     "context": [
-      "Employee Wellness Resource: Early burnout symptoms often include chronic tiredness, increased cynicism or irritability, trouble focusing, and a growing sense of detachment from one's job or daily tasks."
+      "Astronomy Reference: Mars is often called the Red Planet because iron oxide, or rust, is prevalent on its surface, giving the planet a distinct reddish hue visible even from Earth."
     ]
   },
   {
     "id": "g06",
-    "category": "chronic_disease_education",
-    "question": "What is a normal fasting blood glucose range for someone without diabetes?",
-    "reference_answer": "A normal fasting blood glucose level is typically 70-99 mg/dL. Levels of 100-125 mg/dL indicate prediabetes, and 126 mg/dL or higher on two separate tests indicates diabetes.",
+    "category": "general_knowledge_geography",
+    "question": "On which continent is the Sahara Desert located?",
+    "reference_answer": "The Sahara Desert is located in Africa, spanning much of North Africa.",
     "context": [
-      "Chronic Disease Education Module: Normal fasting glucose is 70-99 mg/dL. Prediabetes is defined as 100-125 mg/dL. A fasting glucose of 126 mg/dL or higher on two separate occasions indicates diabetes."
+      "Geography Reference: The Sahara is the largest hot desert in the world, located in Africa and spanning portions of countries including Algeria, Chad, Egypt, Libya, Mali, Mauritania, Morocco, Niger, Sudan, and Tunisia."
     ]
   },
   {
     "id": "g07",
-    "category": "preventive_care",
-    "question": "How many minutes of moderate exercise per week are recommended for adults?",
-    "reference_answer": "At least 150 minutes of moderate-intensity aerobic activity per week, combined with muscle-strengthening activities on two or more days.",
+    "category": "general_knowledge_history",
+    "question": "Who was the primary author of the U.S. Declaration of Independence?",
+    "reference_answer": "Thomas Jefferson was the primary author of the Declaration of Independence, though it was reviewed and edited by a committee including John Adams and Benjamin Franklin.",
     "context": [
-      "Physical Activity Guideline Summary: Adults should aim for at least 150 minutes of moderate-intensity aerobic exercise weekly, plus strength training on 2+ days per week."
+      "History Reference: Thomas Jefferson drafted the initial text of the Declaration of Independence in 1776. A five-person committee, including John Adams and Benjamin Franklin, reviewed and made edits before it was adopted by the Continental Congress."
     ]
   },
   {
     "id": "g08",
-    "category": "medication_safety",
-    "question": "What should someone do if they miss a dose of a daily blood pressure medication?",
-    "reference_answer": "Take the missed dose as soon as remembered unless it is almost time for the next dose, in which case skip the missed dose and resume the normal schedule. Do not double up doses. Patients should call their pharmacist or doctor if unsure.",
+    "category": "general_knowledge_technology",
+    "question": "What is the general difference between a computer's RAM and its storage (hard drive/SSD)?",
+    "reference_answer": "RAM (Random Access Memory) is fast, volatile memory used for actively running programs and data, cleared when the computer powers off. Storage (a hard drive or SSD) is slower but persistent, retaining files and programs even when the computer is off.",
     "context": [
-      "Medication Adherence Guide: If a dose of a daily antihypertensive is missed, take it as soon as remembered, unless close to the next scheduled dose — in that case, skip it. Never take two doses at once to make up for a missed one."
+      "Technology Reference: RAM provides temporary, high-speed workspace for a computer's active processes and is erased on shutdown. Storage devices (HDD/SSD) retain data permanently, but read/write speeds are typically much slower than RAM."
     ]
   },
   {
-    "id": "g09",
-    "category": "nutrition",
-    "question": "What is the difference between soluble and insoluble fiber?",
-    "reference_answer": "Soluble fiber dissolves in water and can help lower blood cholesterol and glucose levels, while insoluble fiber does not dissolve and helps add bulk to stool, supporting regular bowel movements.",
+    "id": "p01",
+    "category": "product_support_billing",
+    "question": "How does Driftbox's monthly billing cycle work?",
+    "reference_answer": "Driftbox charges on the same calendar day each month as your original signup date, automatically renewing your plan unless you cancel beforehand. You can view your next billing date in Account Settings > Billing.",
     "context": [
-      "Nutrition Reference: Soluble fiber dissolves in water, forming a gel that can help reduce cholesterol and blood sugar. Insoluble fiber does not dissolve and adds bulk to stool, aiding digestive regularity."
+      "Driftbox Help Center - Billing: Monthly subscriptions renew automatically on the same day of the month as your original purchase date. Your upcoming charge date and amount are always visible under Account Settings > Billing before it's charged."
     ]
   },
   {
-    "id": "g10",
-    "category": "mental_health",
-    "question": "What is the recommended first step for someone experiencing mild, situational anxiety before a big event?",
-    "reference_answer": "Simple techniques such as slow, deep breathing, grounding exercises, adequate sleep, and limiting caffeine can help manage mild situational anxiety. If anxiety persists or worsens, speaking with a healthcare provider is recommended.",
+    "id": "p02",
+    "category": "product_support_account_security",
+    "question": "How do I enable two-factor authentication on my Driftbox account?",
+    "reference_answer": "You can enable two-factor authentication by going to Account Settings > Security > Two-Factor Authentication, then following the prompts to link an authenticator app or your phone number.",
     "context": [
-      "Mental Wellness Tip Sheet: For mild, event-related anxiety, deep breathing exercises, grounding techniques, good sleep hygiene, and reduced caffeine intake are commonly recommended first steps. Persistent or worsening symptoms warrant professional support."
+      "Driftbox Help Center - Account Security: To turn on two-factor authentication (2FA), navigate to Account Settings > Security > Two-Factor Authentication and choose to set it up via an authenticator app (recommended) or SMS."
     ]
   },
   {
-    "id": "g11",
-    "category": "chronic_disease_education",
-    "question": "Why is medication adherence especially important for managing high blood pressure?",
-    "reference_answer": "Consistent adherence keeps blood pressure controlled over time, which reduces the risk of heart attack, stroke, and kidney damage. Skipping doses can cause blood pressure to spike unpredictably.",
+    "id": "p03",
+    "category": "product_support_sync_troubleshooting",
+    "question": "Why might a file show as 'not syncing' in Driftbox?",
+    "reference_answer": "A file commonly fails to sync in Driftbox due to a poor internet connection, the file exceeding the maximum file size limit, insufficient storage space in the account, or the file being open in another program that's locking it.",
     "context": [
-      "Chronic Disease Education Module: Taking antihypertensive medication consistently, as prescribed, maintains stable blood pressure control and lowers long-term risk of stroke, heart attack, and kidney damage. Inconsistent use can lead to unpredictable pressure spikes."
+      "Driftbox Help Center - Sync Troubleshooting: Files most often fail to sync due to: (1) an unstable network connection, (2) exceeding the single-file size limit for your plan, (3) the account being over its storage quota, or (4) the file being locked open by another application."
     ]
   },
   {
-    "id": "g12",
-    "category": "preventive_care",
-    "question": "How often is a routine eye exam recommended for adults over 40 without existing eye conditions?",
-    "reference_answer": "Adults over 40 without existing eye conditions are generally advised to have a comprehensive eye exam every 2-4 years, increasing to every 1-2 years after age 55.",
+    "id": "p04",
+    "category": "product_support_file_sharing",
+    "question": "How long do Driftbox shared links stay active by default?",
+    "reference_answer": "By default, Driftbox shared links remain active indefinitely until manually revoked, though users can optionally set an expiration date when creating the link.",
     "context": [
-      "Preventive Screening Bulletin: Adults aged 40-54 without eye disease should have comprehensive exams every 2-4 years; those 55-64 every 1-3 years, increasing in frequency with age."
+      "Driftbox Help Center - File Sharing: Shared links do not expire automatically unless you set an expiration date at creation time. Links stay live until you manually disable or delete them from the Shared Links panel."
     ]
   },
   {
-    "id": "g13",
-    "category": "nutrition",
-    "question": "What is a general daily sodium recommendation for adults with high blood pressure?",
-    "reference_answer": "Adults with high blood pressure are generally advised to limit sodium intake to less than 1,500-2,300 mg per day, depending on individual guidance from their care provider.",
+    "id": "p05",
+    "category": "product_support_storage_limits",
+    "question": "What happens when I exceed my Driftbox storage plan limit?",
+    "reference_answer": "When you exceed your storage limit, Driftbox pauses new uploads and syncing of new or changed files, but existing files remain accessible. You'll need to free up space or upgrade your plan to resume syncing.",
     "context": [
-      "Nutrition Education Handout: For individuals managing hypertension, limiting sodium to under 1,500-2,300 mg daily is commonly recommended, with the specific target set by a healthcare provider."
+      "Driftbox Help Center - Storage Limits: Exceeding your plan's storage quota pauses uploads and sync for new/modified files. Previously synced files stay accessible and are not deleted. Syncing resumes automatically once you're back under the limit."
     ]
   },
   {
-    "id": "g14",
-    "category": "medication_safety",
-    "question": "Can grapefruit juice interact with common medications?",
-    "reference_answer": "Yes, grapefruit juice can interfere with how the body metabolizes certain medications, including some statins, blood pressure drugs, and immunosuppressants, potentially increasing side effects. Patients should check with a pharmacist about their specific medications.",
+    "id": "p06",
+    "category": "product_support_billing",
+    "question": "Can I switch from a monthly to an annual Driftbox plan in the middle of my billing cycle?",
+    "reference_answer": "Yes, you can switch to an annual plan at any time from Account Settings > Billing. Driftbox will prorate your remaining monthly balance as a credit toward the new annual charge.",
     "context": [
-      "Medication Safety Sheet: Grapefruit and grapefruit juice can inhibit enzymes that metabolize certain drugs (e.g., some statins, calcium channel blockers), raising blood levels of the medication and risk of side effects."
+      "Driftbox Help Center - Billing: Plan changes, including monthly-to-annual switches, can be made anytime from Account Settings > Billing. Any unused portion of your current billing period is credited proportionally toward the new plan's cost."
     ]
   },
   {
-    "id": "g15",
-    "category": "chronic_disease_education",
-    "question": "What lifestyle changes are commonly recommended alongside medication for managing type 2 diabetes?",
-    "reference_answer": "Common recommendations include a balanced diet with controlled carbohydrate intake, regular physical activity, weight management, routine blood glucose monitoring, and avoiding tobacco use.",
+    "id": "p07",
+    "category": "product_support_account_security",
+    "question": "What should I do if I think my Driftbox account was accessed without my permission?",
+    "reference_answer": "Immediately change your password, enable two-factor authentication if not already active, and review the 'Active Sessions' list in Account Settings > Security to sign out any unrecognized devices.",
     "context": [
-      "Chronic Disease Education Module: Alongside prescribed medication, type 2 diabetes management typically includes balanced carbohydrate intake, regular exercise, maintaining a healthy weight, routine glucose monitoring, and avoiding tobacco."
+      "Driftbox Help Center - Account Security: If you suspect unauthorized access, change your password right away, turn on two-factor authentication, and check Account Settings > Security > Active Sessions to revoke access from any device you don't recognize."
     ]
   },
   {
-    "id": "g16",
-    "category": "mental_health",
-    "question": "How much sleep is generally recommended for adults to support mental well-being?",
-    "reference_answer": "Most adults are recommended to get 7-9 hours of sleep per night to support cognitive function and emotional well-being.",
+    "id": "p08",
+    "category": "product_support_sync_troubleshooting",
+    "question": "Why does Driftbox use more bandwidth right after I install the desktop app?",
+    "reference_answer": "Right after installation, Driftbox performs an initial full sync of your entire cloud library to the new device, which temporarily uses significantly more bandwidth than normal day-to-day syncing of new changes.",
     "context": [
-      "Mental Wellness Tip Sheet: Adults generally need 7-9 hours of sleep nightly for optimal mood regulation, memory, and overall mental health."
+      "Driftbox Help Center - Sync Troubleshooting: A newly installed desktop app performs a one-time initial sync, downloading your full library to that device. This causes a temporary spike in bandwidth usage that settles once the initial sync finishes."
     ]
   }
 ]

@@ -15,10 +15,10 @@ from .metrics import compute_cost_usd, score_accuracy, score_empathy, score_fait
 from .storage import ResultRow, connect, create_run, insert_result
 
 ANSWER_SYSTEM_PROMPT = (
-    "You are a helpful health-plan member support assistant. Answer clearly and "
-    "accurately, in a warm and empathetic tone appropriate for someone asking a "
-    "healthcare-related question. If context passages are provided, ground your "
-    "answer in them and do not introduce claims the context does not support."
+    "You are a helpful customer support and general-knowledge assistant. Answer "
+    "clearly and accurately, in a warm and approachable tone. If context passages "
+    "are provided, ground your answer in them and do not introduce claims the "
+    "context does not support."
 )
 
 

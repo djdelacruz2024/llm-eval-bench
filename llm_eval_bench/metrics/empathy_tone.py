@@ -1,5 +1,5 @@
-"""Custom LLM-as-judge metric scoring tone/empathy — relevant for
-conversational healthcare AI, where a factually correct answer delivered
+"""Custom LLM-as-judge metric scoring tone/empathy — relevant for any
+conversational support AI, where a factually correct answer delivered
 coldly or dismissively is still a bad response.
 """
 
@@ -12,9 +12,9 @@ from .judge_utils import call_judge
 
 EMPATHY_PROMPT_TEMPLATE = """\
 Rubric: Score the tone of the CANDIDATE ANSWER for warmth, empathy, and
-appropriateness, as if it were spoken to someone asking a healthcare-related
-question. The answer should be clear and respectful without being cold,
-clinical-sounding, dismissive, or alarmist.
+appropriateness, as if it were spoken to a customer asking a support or
+general-knowledge question. The answer should be clear and respectful
+without being cold, clinical-sounding, dismissive, or alarmist.
 
 Score 1-5:
   5 = Warm, respectful, reassuring where appropriate, clearly written for a person (not a textbook).

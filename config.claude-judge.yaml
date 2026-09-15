@@ -1,0 +1,38 @@
+# Same models-under-test as config.example.yaml (free, local, via Ollama),
+# but with Claude Sonnet 5 as the judge instead of a small local model —
+# a stronger, more consistent grader, at real per-token API cost.
+#
+# Requires: pip install -e ".[anthropic]"  and  export ANTHROPIC_API_KEY=...
+#
+# Anthropic first-party API pricing used below ($/1M -> $/1K tokens):
+#   Claude Sonnet 5 (claude-sonnet-5): $2 / $10 per 1M  ->  $0.002 / $0.01 per 1K
+#   Claude Opus 5   (claude-opus-5):   $5 / $25 per 1M  ->  $0.005 / $0.025 per 1K
+# Swap model_id to claude-opus-5 (and the rates above) for a stronger/pricier judge.
+# These are current as of this file's writing — re-check before relying on them
+# for a real cost estimate, since Anthropic's pricing can change.
+
+models:
+  - name: llama3.2-3b
+    provider: ollama
+    model_id: llama3.2:3b
+    cost_per_1k_prompt_tokens: 0.0
+    cost_per_1k_completion_tokens: 0.0
+
+  - name: mistral-7b
+    provider: ollama
+    model_id: mistral:7b
+    cost_per_1k_prompt_tokens: 0.0
+    cost_per_1k_completion_tokens: 0.0
+
+judge:
+  name: claude-sonnet-5-judge
+  provider: anthropic
+  model_id: claude-sonnet-5
+  cost_per_1k_prompt_tokens: 0.002
+  cost_per_1k_completion_tokens: 0.01
+  # extra kwargs below are passed straight to AnthropicProvider:
+  effort: low          # low | medium | high | xhigh | max — low is plenty for a grading rubric
+  max_tokens: 2048
+
+dataset_path: data/golden_dataset.json
+no_rag_dataset_path: data/no_rag_rules.json

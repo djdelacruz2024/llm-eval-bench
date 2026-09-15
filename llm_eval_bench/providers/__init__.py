@@ -1,3 +1,4 @@
+from .anthropic_provider import AnthropicProvider
 from .base import GenerationResult, ModelProvider, ProviderError, estimate_tokens
 from .huggingface_provider import HuggingFaceProvider
 from .mock_provider import MockJudgeProvider, MockProvider
@@ -8,6 +9,7 @@ _PROVIDER_CLASSES = {
     "mock_judge": MockJudgeProvider,
     "ollama": OllamaProvider,
     "huggingface": HuggingFaceProvider,
+    "anthropic": AnthropicProvider,
 }
 
 
@@ -27,6 +29,7 @@ __all__ = [
     "ModelProvider",
     "ProviderError",
     "estimate_tokens",
+    "AnthropicProvider",
     "HuggingFaceProvider",
     "MockProvider",
     "MockJudgeProvider",
