@@ -1,0 +1,17 @@
+# Fully offline demo config — uses the built-in MockProvider instead of a
+# real model, so you can see the whole pipeline (run -> score -> store ->
+# report -> dashboard) work end-to-end with zero setup, before installing
+# Ollama and pointing config.yaml at real models.
+
+models:
+  - name: mock-a
+    provider: mock
+  - name: mock-b
+    provider: mock
+
+judge:
+  name: mock-judge
+  provider: mock_judge
+
+dataset_path: data/golden_dataset.json
+no_rag_dataset_path: data/no_rag_rules.json

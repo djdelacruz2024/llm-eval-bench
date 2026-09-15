@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}llm-eval-bench{% endblock %}</title>
+  <style>
+    :root {
+      --bg: #0f1115; --panel: #171a21; --border: #262b36;
+      --text: #e6e8ec; --muted: #9aa3b2; --accent: #6ea8fe;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    header {
+      padding: 20px 32px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: baseline; gap: 12px;
+    }
+    header a { color: var(--text); text-decoration: none; font-weight: 600; font-size: 18px; }
+    header .subtitle { color: var(--muted); font-size: 13px; }
+    main { padding: 24px 32px; max-width: 1100px; margin: 0 auto; }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+    th { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.04em; }
+    tr:hover td { background: var(--panel); }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; }
+    a.run-link { color: var(--accent); text-decoration: none; }
+    a.run-link:hover { text-decoration: underline; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; background: #22314f; color: var(--accent); }
+    .muted { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/">llm-eval-bench</a>
+    <span class="subtitle">multi-model LLM benchmarking &amp; evaluation dashboard</span>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

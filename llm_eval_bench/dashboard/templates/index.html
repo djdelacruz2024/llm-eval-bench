@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Runs — llm-eval-bench{% endblock %}
+{% block content %}
+  <h1>Benchmark runs</h1>
+  {% if not runs %}
+    <p class="muted">No runs yet. Kick one off with <code>llm-eval-bench run --config config.yaml</code>.</p>
+  {% else %}
+    <table>
+      <thead>
+        <tr><th>Run ID</th><th>Suite</th><th>Started</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        {% for run in runs %}
+        <tr>
+          <td><a class="run-link" href="/runs/{{ run['run_id'] }}">{{ run['run_id'] }}</a></td>
+          <td><span class="badge">{{ run['suite'] }}</span></td>
+          <td class="muted">{{ run['started_at'] }}</td>
+          <td class="muted">{{ run['notes'] or '' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+{% endblock %}

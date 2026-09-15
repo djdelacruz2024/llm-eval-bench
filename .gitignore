@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# generated at runtime, not source
+*.db
+reports/*.md
+reports/*.csv
+!reports/.gitkeep

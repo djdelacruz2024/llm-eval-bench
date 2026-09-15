@@ -1,0 +1,32 @@
+# Copy to config.yaml and adjust model names to whatever you've pulled with
+# `ollama pull <model>`. Cost rates are $/1K tokens — left at 0 for local
+# models; fill them in to model a hosted-API model's cost instead.
+
+models:
+  - name: llama3.2-3b
+    provider: ollama
+    model_id: llama3.2:3b
+    cost_per_1k_prompt_tokens: 0.0
+    cost_per_1k_completion_tokens: 0.0
+
+  - name: mistral-7b
+    provider: ollama
+    model_id: mistral:7b
+    cost_per_1k_prompt_tokens: 0.0
+    cost_per_1k_completion_tokens: 0.0
+
+  - name: phi3-mini
+    provider: ollama
+    model_id: phi3:mini
+    cost_per_1k_prompt_tokens: 0.0
+    cost_per_1k_completion_tokens: 0.0
+
+# The judge should generally be your strongest local model — it's grading
+# the others, so weaker judges produce noisier scores.
+judge:
+  name: judge
+  provider: ollama
+  model_id: llama3.2:3b
+
+dataset_path: data/golden_dataset.json
+no_rag_dataset_path: data/no_rag_rules.json

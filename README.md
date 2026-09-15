@@ -1,0 +1,135 @@
+# llm-eval-bench
+
+An open-source, multi-model **LLM benchmarking & evaluation framework**: run the same golden dataset through several models, score each response with an LLM-as-judge on accuracy, faithfulness/hallucination, and tone/empathy, track latency and cost, and get a leaderboard report and dashboard out the other end.
+
+![Dashboard screenshot](docs/dashboard-screenshot.png)
+
+## Why this exists
+
+During an AI/ML engineering internship at a healthcare company, I built an internal framework that benchmarked five LLMs (GPT and Claude models) against a healthcare golden dataset — measuring latency, cost, accuracy, faithfulness/hallucination, and a custom empathy metric, with a second suite testing how models behave when retrieval (RAG) comes up empty. That work is naturally proprietary. This project is my own re-implementation of the same core ideas, built from scratch, generalized to a public non-PHI domain, and designed to run entirely on **free, open-source, locally-hosted models** (via [Ollama](https://ollama.com)) so anyone can clone it and run it with zero API keys and zero cost.
+
+**Disclaimer:** the included dataset is synthetic, general-audience health-education content I wrote for this project — it is not real patient data, not medical advice, and not affiliated with any employer. It exists purely to exercise the evaluation framework.
+
+## Features
+
+- **Multi-model benchmarking** — point the same question set at any number of models and compare them head-to-head.
+- **LLM-as-judge scoring** — a configurable judge model grades every answer against a rubric and returns structured JSON.
+- **Accuracy** — does the answer match the reference answer's key facts (1-5 scale)?
+- **Faithfulness / hallucination detection** — is every claim in the answer grounded in the retrieved context, or did the model add unsupported claims?
+- **Empathy / tone** — a custom rubric scoring warmth and appropriateness, since a factually correct answer delivered coldly is still a bad support response.
+- **Cost & latency tracking** — per-response wall-clock latency and a configurable $/1K-token cost model (useful for comparing a free local model against what the same workload would cost on a hosted API).
+- **No-RAG robustness suite** — a second, JSON-rule-driven benchmark that asks questions with *no* retrieved context, to check how each model behaves when retrieval fails to cover a question (a real constraint when a knowledge base has 100k+ documents and can't cover every possible query).
+- **Results dashboard** — a small FastAPI app that reads the SQLite results and renders a per-model leaderboard, a chart, and a per-question drill-down table. No external CDN dependency — Chart.js is vendored locally.
+- **Offline demo mode** — a `mock` provider lets you run the entire pipeline end-to-end with no models installed, to see how it works before setting up Ollama.
+
+## Architecture
+
+```
+                ┌────────────────┐
+ config.yaml ─▶ │  BenchmarkConfig │
+                └───────┬─────────┘
+                        │
+      ┌─────────────────┼──────────────────┐
+      ▼                                     ▼
+┌───────────┐                       ┌───────────────┐
+│  dataset  │                       │   providers    │
+│  (JSON)   │                       │ ollama / hf /  │
+└─────┬─────┘                       │     mock       │
+      │                             └───────┬────────┘
+      │        ┌────────────────────────────┤
+      ▼        ▼                            ▼
+  benchmark.py / no_rag_benchmark.py   judge model
+      │  (generate answer, then score with judge)
+      ▼
+  metrics/  (accuracy, faithfulness, empathy, no-RAG compliance, cost)
+      │
+      ▼
+  storage.py ──▶ SQLite (results.db)
+      │
+      ├──▶ report.py  ──▶ reports/<run_id>.md + .csv
+      └──▶ dashboard/  ──▶ FastAPI leaderboard + chart (localhost:8000)
+```
+
+## Quickstart
+
+### 1. See it work, no setup required
+
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+
+# Runs the full pipeline against 2 mock models + a mock judge — no Ollama needed.
+llm-eval-bench run --config config.demo.yaml --db results.db
+llm-eval-bench run-no-rag --config config.demo.yaml --db results.db
+
+llm-eval-bench serve --db results.db
+# -> open http://127.0.0.1:8000
+```
+
+### 2. Run it against real open-source models
+
+```bash
+# Install Ollama: https://ollama.com/download
+ollama pull llama3.2:3b
+ollama pull mistral:7b
+ollama pull phi3:mini
+
+cp config.example.yaml config.yaml   # edit model names to whatever you pulled
+
+llm-eval-bench run --config config.yaml --db results.db
+llm-eval-bench run-no-rag --config config.yaml --db results.db
+llm-eval-bench serve --db results.db
+```
+
+Each `run`/`run-no-rag` also writes a markdown + CSV report to `reports/`.
+
+## Metrics explained
+
+| Metric | Suite | What it measures |
+|---|---|---|
+| Accuracy | golden | Does the answer convey the same key facts as the reference answer? (1-5, judged) |
+| Faithfulness | golden | Fraction of claims in the answer that are supported by the retrieved context passages; lists unsupported claims as a hallucination signal |
+| Empathy / tone | golden | Warmth and appropriateness of the response tone (1-5, judged) |
+| Compliance | no-RAG | Given no retrieved context, did the model follow the question's behavior rule (e.g. "decline to fabricate a specific claim status", "recommend emergency care")? |
+| Acknowledged uncertainty | no-RAG | Did the model admit what it doesn't/can't know rather than guessing? |
+| Latency | both | Wall-clock seconds for the model to respond |
+| Cost | both | `(prompt_tokens / 1000) * rate + (completion_tokens / 1000) * rate`, using per-model rates from config (0 for local models) |
+
+## Project structure
+
+```
+llm_eval_bench/
+  providers/        # ModelProvider interface + ollama/huggingface/mock backends
+  metrics/          # LLM-as-judge scoring functions (accuracy, faithfulness, empathy, no-RAG compliance, cost)
+  dashboard/         # FastAPI app + Jinja2 templates + vendored chart.js
+  config.py          # YAML config -> BenchmarkConfig / ModelConfig
+  dataset.py         # golden_dataset.json / no_rag_rules.json loaders
+  benchmark.py        # golden-suite orchestration
+  no_rag_benchmark.py # no-RAG suite orchestration
+  storage.py          # SQLite persistence
+  report.py           # markdown + CSV report generation
+  cli.py              # `llm-eval-bench` command-line entry point
+data/
+  golden_dataset.json   # 16 synthetic health-education Q&A pairs with retrieval context
+  no_rag_rules.json      # 8 JSON-defined behavior rules for the no-RAG suite
+tests/                   # pytest suite (runs fully offline against the mock provider)
+config.demo.yaml          # offline demo config (mock provider)
+config.example.yaml       # template for real Ollama models
+```
+
+## Testing
+
+```bash
+pip install -e ".[dev]"
+pytest -q
+```
+
+The full suite (35 tests) runs offline in under a second using the built-in mock provider — no models, network, or GPU required, which also makes it CI-friendly.
+
+## Tech stack
+
+Python, SQLite, FastAPI, Jinja2, Chart.js, YAML-based config, [Ollama](https://ollama.com) for local open-source model serving (Llama, Mistral, Phi, etc.), with an optional Hugging Face `transformers` backend.
+
+## License
+
+MIT — see [LICENSE](LICENSE).

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}{{ run_id }} — llm-eval-bench{% endblock %}
+{% block content %}
+  <h1>{{ run_id }} <span class="badge">{{ suite }}</span></h1>
+
+  <div class="card">
+    <canvas id="leaderboardChart" height="90"></canvas>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0;">Leaderboard</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Model</th>
+          {% if suite == "golden" %}
+            <th>Avg Accuracy</th><th>Correct %</th><th>Avg Faithfulness</th><th>Avg Empathy</th>
+          {% else %}
+            <th>Compliance %</th><th>Uncertainty Ack %</th>
+          {% endif %}
+          <th>Avg Latency (s)</th><th>Total Cost ($)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in board %}
+        <tr>
+          <td>{{ entry.model }}</td>
+          {% if suite == "golden" %}
+            <td>{{ entry.avg_accuracy }}</td><td>{{ entry.correct_pct }}</td>
+            <td>{{ entry.avg_faithfulness }}</td><td>{{ entry.avg_empathy }}</td>
+          {% else %}
+            <td>{{ entry.compliance_pct }}</td><td>{{ entry.uncertainty_ack_pct }}</td>
+          {% endif %}
+          <td>{{ entry.avg_latency_s }}</td><td>{{ entry.total_cost_usd }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0;">Per-question results</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Model</th><th>Question</th>
+          {% if suite == "golden" %}
+            <th>Accuracy</th><th>Faithfulness</th><th>Empathy</th>
+          {% else %}
+            <th>Compliant</th><th>Ack. Uncertainty</th>
+          {% endif %}
+          <th>Latency (s)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td>{{ row['model_name'] }}</td>
+          <td class="muted">{{ row['question'] }}</td>
+          {% if suite == "golden" %}
+            <td>{{ row['accuracy_score'] }}</td>
+            <td>{{ row['faithfulness_score'] if row['faithfulness_score'] is not none else '—' }}</td>
+            <td>{{ row['empathy_score'] }}</td>
+          {% else %}
+            <td>{{ 'yes' if row['no_rag_compliant'] else 'no' }}</td>
+            <td>{{ 'yes' if row['acknowledged_uncertainty'] else 'no' }}</td>
+          {% endif %}
+          <td>{{ '%.2f'|format(row['latency_s']) if row['latency_s'] is not none else '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script src="/static/chart.umd.min.js"></script>
+  <script>
+    const board = {{ board | tojson }};
+    const suite = {{ suite | tojson }};
+    const labels = board.map(e => e.model);
+    const datasets = suite === "golden"
+      ? [
+          { label: "Avg Accuracy (1-5)", data: board.map(e => e.avg_accuracy) },
+          { label: "Avg Empathy (1-5)", data: board.map(e => e.avg_empathy) },
+        ]
+      : [
+          { label: "Compliance %", data: board.map(e => e.compliance_pct) },
+        ];
+
+    new Chart(document.getElementById("leaderboardChart"), {
+      type: "bar",
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: "#e6e8ec" } } },
+        scales: {
+          x: { ticks: { color: "#9aa3b2" }, grid: { color: "#262b36" } },
+          y: { ticks: { color: "#9aa3b2" }, grid: { color: "#262b36" }, beginAtZero: true },
+        },
+      },
+    });
+  </script>
+{% endblock %}
