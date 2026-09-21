@@ -67,6 +67,14 @@ llm-eval-bench serve --db results.db
 # -> open http://127.0.0.1:8000
 ```
 
+Or skip straight to real numbers: `results-claude-demo.db` in this repo is the actual output of a live
+Claude Haiku 4.5 vs. Sonnet 5 run (see `reports/claude-demo-golden.md` / `claude-demo-no-rag.md` for the
+plain-text summary). No API key needed to view it:
+
+```bash
+llm-eval-bench serve --db results-claude-demo.db
+```
+
 ### 2. Run it against real open-source models
 
 ```bash
