@@ -1,5 +1,9 @@
 # llm-eval-bench
 
+[![tests](https://github.com/djdelacruz2024/llm-eval-bench/actions/workflows/tests.yml/badge.svg)](https://github.com/djdelacruz2024/llm-eval-bench/actions/workflows/tests.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](pyproject.toml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 An open-source, multi-model **LLM benchmarking & evaluation framework**: run the same golden dataset through several models, score each response with an LLM-as-judge on accuracy, faithfulness/hallucination, and tone/empathy, track latency and cost, and get a leaderboard report and dashboard out the other end.
 
 ![Dashboard showing a real Claude Haiku 4.5 vs. Sonnet 5 run](docs/real-run-golden.png)
@@ -197,7 +201,7 @@ pip install -e ".[dev]"
 pytest -q
 ```
 
-The full suite (44 tests) runs offline using the built-in mock provider. It needs no models, network, GPU, or API keys, which makes it CI-friendly. Expect it to finish in a few seconds to under 20 seconds, depending on the machine.
+The full suite (44 tests) runs offline using the built-in mock provider. It needs no models, network, GPU, or API keys, which makes it CI-friendly: GitHub Actions runs it on Python 3.10-3.13 for every push and pull request. Expect it to finish in a few seconds to under 20 seconds, depending on the machine.
 
 ## Tech stack
 
