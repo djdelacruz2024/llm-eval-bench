@@ -59,6 +59,7 @@ def run_no_rag_benchmark(
                         question_id=case.id,
                         category=case.category,
                         question=case.question,
+                        expected_behavior=case.expected_behavior,
                         answer_text=answer.text,
                         latency_s=answer.latency_s,
                         prompt_tokens=answer.prompt_tokens,

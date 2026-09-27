@@ -27,6 +27,9 @@ CREATE TABLE IF NOT EXISTS results (
     question_id TEXT NOT NULL,
     category TEXT,
     question TEXT,
+    reference_answer TEXT,            -- golden suite: the ground-truth answer
+    context TEXT,                     -- golden suite: JSON list of retrieved passages
+    expected_behavior TEXT,           -- no-RAG suite: JSON behavior rule
     answer_text TEXT,
     latency_s REAL,
     prompt_tokens INTEGER,
@@ -48,6 +51,14 @@ CREATE INDEX IF NOT EXISTS idx_results_run ON results(run_id);
 CREATE INDEX IF NOT EXISTS idx_results_model ON results(model_name);
 """
 
+# Columns added after the first release. `connect` adds any that are missing
+# so databases written by older versions still open.
+_ADDED_RESULT_COLUMNS = {
+    "reference_answer": "TEXT",
+    "context": "TEXT",
+    "expected_behavior": "TEXT",
+}
+
 
 @dataclass
 class ResultRow:
@@ -57,6 +68,9 @@ class ResultRow:
     question_id: str
     category: str | None = None
     question: str | None = None
+    reference_answer: str | None = None
+    context: list[str] = field(default_factory=list)
+    expected_behavior: dict | None = None
     answer_text: str | None = None
     latency_s: float | None = None
     prompt_tokens: int | None = None
@@ -77,6 +91,11 @@ def connect(db_path: str | Path) -> sqlite3.Connection:
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     conn.executescript(SCHEMA)
+    existing = {row["name"] for row in conn.execute("PRAGMA table_info(results)")}
+    for column, col_type in _ADDED_RESULT_COLUMNS.items():
+        if column not in existing:
+            conn.execute(f"ALTER TABLE results ADD COLUMN {column} {col_type}")
+    conn.commit()
     return conn
 
 
@@ -92,14 +111,17 @@ def insert_result(conn: sqlite3.Connection, row: ResultRow) -> None:
     conn.execute(
         """
         INSERT INTO results (
-            run_id, suite, model_name, question_id, category, question, answer_text,
+            run_id, suite, model_name, question_id, category, question,
+            reference_answer, context, expected_behavior, answer_text,
             latency_s, prompt_tokens, completion_tokens, cost_usd,
             accuracy_score, correct, faithfulness_score, unsupported_claims,
             empathy_score, no_rag_compliant, acknowledged_uncertainty, judge_notes, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             row.run_id, row.suite, row.model_name, row.question_id, row.category, row.question,
+            row.reference_answer, json.dumps(row.context),
+            json.dumps(row.expected_behavior) if row.expected_behavior is not None else None,
             row.answer_text, row.latency_s, row.prompt_tokens, row.completion_tokens, row.cost_usd,
             row.accuracy_score, _bool_to_int(row.correct), row.faithfulness_score,
             json.dumps(row.unsupported_claims), row.empathy_score,

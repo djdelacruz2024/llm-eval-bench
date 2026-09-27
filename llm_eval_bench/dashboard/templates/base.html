@@ -16,7 +16,7 @@
     }
     header {
       padding: 20px 32px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: baseline; gap: 12px;
+      display: flex; align-items: baseline; gap: 4px 12px; flex-wrap: wrap;
     }
     header a { color: var(--text); text-decoration: none; font-weight: 600; font-size: 18px; }
     header .subtitle { color: var(--muted); font-size: 13px; }
@@ -30,6 +30,75 @@
     a.run-link:hover { text-decoration: underline; }
     .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; background: #22314f; color: var(--accent); }
     .muted { color: var(--muted); }
+    .small { font-size: 12px; }
+    h2 { margin-top: 0; }
+    .crumbs { margin: 0 0 4px; font-size: 13px; }
+    .crumbs a { color: var(--accent); text-decoration: none; }
+    .table-wrap { overflow-x: auto; }
+
+    .chart-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+    .chart-head h2 { margin: 0; }
+    .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; }
+    .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+    .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+    .panels { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 12px 24px; }
+    .panel { min-width: 0; }
+    .panel-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; display: flex; justify-content: space-between; gap: 8px; }
+    .panel-title span { color: var(--muted); font-weight: 400; font-size: 12px; }
+
+    .metric { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .metric.good { background: #15301f; color: #6fdc8c; }
+    .metric.warn { background: #3a2f12; color: #f1c21b; }
+    .metric.bad  { background: #3d1a1d; color: #ff8389; }
+    .metric.na   { background: #20242d; color: var(--muted); }
+    .metric-label { font-size: 12px; color: var(--muted); margin-left: 6px; }
+    .metric-label:first-child { margin-left: 0; }
+
+    .section-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 28px 0 12px; flex-wrap: wrap; }
+    .section-head h2 { margin: 0; }
+    .btn { background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
+    .btn:hover { border-color: var(--accent); }
+
+    details.question { padding: 0; }
+    details.question > summary { list-style: none; cursor: pointer; padding: 14px 20px; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+    details.question > summary::-webkit-details-marker { display: none; }
+    details.question > summary::before { content: "▸"; color: var(--muted); }
+    details.question[open] > summary::before { content: "▾"; }
+    details.question[open] > summary { border-bottom: 1px solid var(--border); }
+    .qid { font-family: ui-monospace, Consolas, monospace; color: var(--muted); font-size: 13px; }
+    .qtext { flex: 1 1 320px; font-weight: 600; }
+    .qscores { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .question-body { padding: 16px 20px 20px; }
+    .question-body h3 { font-size: 14px; margin: 0 0 8px; }
+    .category { text-transform: capitalize; color: var(--muted); font-size: 12px; margin: 0 0 12px; }
+    .label { color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin: 12px 0 4px; }
+    .ground-truth { background: #12151b; border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 14px; }
+    .ground-truth p { margin: 4px 0; }
+    .ground-truth ul { margin: 4px 0; padding-left: 20px; }
+    .ground-truth ul.context li, .ground-truth ul.forbidden li { color: var(--muted); }
+    .ground-truth ul.forbidden li::marker { color: #ff8389; }
+
+    .responses { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 16px; }
+    .response { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; min-width: 0; }
+    .response-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+    .metrics { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 4px 0 12px; }
+    .answer { font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
+    .answer h4 { font-size: 14px; margin: 12px 0 4px; }
+    .answer p { margin: 6px 0; }
+    .answer ul, .answer ol { margin: 6px 0; padding-left: 22px; }
+    .answer code { background: #20242d; padding: 1px 4px; border-radius: 4px; font-size: 13px; }
+    .claims { background: #2a1719; border-radius: 6px; padding: 4px 12px 8px; margin-top: 12px; font-size: 13px; }
+    .claims .label { color: #ff8389; }
+    .claims ul { margin: 4px 0; padding-left: 20px; }
+    .rationale { margin-top: 12px; font-size: 13px; }
+    .rationale dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; }
+    .rationale dt { color: var(--muted); text-transform: capitalize; }
+    .rationale dd { margin: 0; }
+    @media (max-width: 640px) {
+      main, header { padding-left: 16px; padding-right: 16px; }
+      .responses { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>

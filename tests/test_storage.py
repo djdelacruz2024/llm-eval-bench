@@ -1,3 +1,6 @@
+import json
+import sqlite3
+
 from llm_eval_bench.storage import ResultRow, connect, create_run, fetch_results, fetch_runs, insert_result
 
 
@@ -58,4 +61,41 @@ def test_fetch_results_filters_by_run(tmp_path):
 
     assert len(rows_a) == 1
     assert len(rows_all) == 2
+    conn.close()
+
+
+def test_ground_truth_round_trips(tmp_path):
+    conn = connect(tmp_path / "test.db")
+    create_run(conn, "run-1", suite="golden")
+    insert_result(
+        conn,
+        ResultRow(
+            run_id="run-1", suite="golden", model_name="m", question_id="g01",
+            reference_answer="100 °C", context=["passage one", "passage two"],
+        ),
+    )
+    row = fetch_results(conn, "run-1")[0]
+    assert row["reference_answer"] == "100 °C"
+    assert json.loads(row["context"]) == ["passage one", "passage two"]
+    assert row["expected_behavior"] is None
+    conn.close()
+
+
+def test_connect_adds_new_columns_to_an_older_database(tmp_path):
+    db_path = tmp_path / "old.db"
+    old = sqlite3.connect(db_path)
+    old.executescript(
+        """
+        CREATE TABLE runs (run_id TEXT PRIMARY KEY, suite TEXT NOT NULL,
+                           started_at TEXT NOT NULL, notes TEXT);
+        CREATE TABLE results (id INTEGER PRIMARY KEY AUTOINCREMENT, run_id TEXT NOT NULL,
+                              suite TEXT NOT NULL, model_name TEXT NOT NULL,
+                              question_id TEXT NOT NULL, created_at TEXT NOT NULL);
+        """
+    )
+    old.close()
+
+    conn = connect(db_path)
+    columns = {row["name"] for row in conn.execute("PRAGMA table_info(results)")}
+    assert {"reference_answer", "context", "expected_behavior"} <= columns
     conn.close()

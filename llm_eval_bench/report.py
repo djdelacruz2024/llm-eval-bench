@@ -18,9 +18,9 @@ def export_csv(conn: sqlite3.Connection, run_id: str, out_path: str | Path) -> N
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     if not rows:
-        out_path.write_text("")
+        out_path.write_text("", encoding="utf-8")
         return
-    with out_path.open("w", newline="") as f:
+    with out_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=rows[0].keys())
         writer.writeheader()
         for row in rows:
@@ -96,6 +96,6 @@ def write_report(conn: sqlite3.Connection, run_id: str, reports_dir: str | Path 
     md_path = reports_dir / f"{run_id}.md"
     csv_path = reports_dir / f"{run_id}.csv"
 
-    md_path.write_text(generate_markdown_report(conn, run_id))
+    md_path.write_text(generate_markdown_report(conn, run_id), encoding="utf-8")
     export_csv(conn, run_id, csv_path)
     return md_path

@@ -19,7 +19,7 @@ During an AI/ML engineering internship at a healthcare company, I built an inter
 - **Empathy / tone** — a custom rubric scoring warmth and appropriateness, since a factually correct answer delivered coldly is still a bad support response.
 - **Cost & latency tracking** — per-response wall-clock latency and a configurable $/1K-token cost model (useful for comparing a free local model against what the same workload would cost on a hosted API).
 - **No-RAG robustness suite** — a second, JSON-rule-driven benchmark that asks questions with *no* retrieved context, to check how each model behaves when retrieval fails to cover a question (a real constraint when a knowledge base can't cover every possible query).
-- **Results dashboard** — a small FastAPI app that reads the SQLite results and renders a per-model leaderboard, a chart, and a per-question drill-down table, plus a JSON summary endpoint. No external CDN dependency — Chart.js is vendored locally.
+- **Results dashboard** — a small FastAPI app that reads the SQLite results and renders a per-model leaderboard, a chart, and a question-by-question breakdown: each model's response side by side with the ground truth it was graded against (reference answer and retrieved context, or the no-RAG behavior rule), its scores, any unsupported claims, and the judge's reasoning for each metric. Plus a JSON summary endpoint. No external CDN dependency — Chart.js is vendored locally.
 - **Offline demo mode** — a `mock` provider lets you run the entire pipeline end-to-end with no models installed, to see how it works before setting up Ollama.
 - **Pluggable providers** — Ollama, Hugging Face `transformers`, and Anthropic (Claude) backends behind one small interface; the judge is just another provider entry in the config.
 
@@ -40,6 +40,10 @@ During an AI/ML engineering internship at a healthcare company, I built an inter
 |---|---|---|---|---|
 | claude-haiku-4-5 | 100.0% | 50.0% | 3.058 | 0.0105 |
 | claude-sonnet-5 | 100.0% | 75.0% | 4.877 | 0.0309 |
+
+Every score is traceable in the dashboard. Each question shows what the models were graded against, their full responses, and why the judge scored them the way it did:
+
+![Question drill-down: reference answer, retrieved context, both responses, scores, unsupported claims, and judge reasoning](docs/question-drilldown.png)
 
 What it shows: both models get every fact right, so accuracy alone can't tell them apart. The faithfulness metric can: Haiku added at least one claim the context didn't support in 9 of 16 answers, versus 6 of 16 for Sonnet. Sonnet was also warmer in tone and more willing to admit what it couldn't know, at roughly 2.7× the cost and 1.3-1.6× the latency. Cost columns cover the models under test only, not the judge calls. Caveat: Sonnet 5 also acted as the judge here, so its own scores may carry some self-preference bias; a different judge model would give a fairer comparison.
 
@@ -65,7 +69,7 @@ What it shows: both models get every fact right, so accuracy alone can't tell th
   metrics/  (accuracy, faithfulness, empathy, no-RAG compliance, cost)
        │
        ▼
-  storage.py ──▶ SQLite (results.db)
+  storage.py ──▶ SQLite (results.db: scores + responses + ground truth)
        │
        ├──▶ report.py  ──▶ reports/<run_id>.md + .csv
        └──▶ dashboard/ ──▶ FastAPI leaderboard + chart (localhost:8000)

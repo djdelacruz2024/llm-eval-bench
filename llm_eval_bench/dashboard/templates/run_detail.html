@@ -1,20 +1,47 @@
 {% extends "base.html" %}
 {% block title %}{{ run_id }} — llm-eval-bench{% endblock %}
+
+{% macro score_class(value, good, warn) -%}
+  {%- if value is none -%}na{%- elif value >= good -%}good{%- elif value >= warn -%}warn{%- else -%}bad{%- endif -%}
+{%- endmacro %}
+
+{% macro flag(value, good_when=1) -%}
+  {%- if value is none -%}<span class="metric na">—</span>
+  {%- elif value == good_when -%}<span class="metric good">yes</span>
+  {%- else -%}<span class="metric bad">no</span>{%- endif -%}
+{%- endmacro %}
+
+{% macro pct(value) -%}{{ '—' if value is none else value ~ '%' }}{%- endmacro %}
+
 {% block content %}
+  <p class="crumbs"><a href="/">All runs</a></p>
   <h1>{{ run_id }} <span class="badge">{{ suite }}</span></h1>
+  <p class="muted">
+    {{ questions | length }} questions · {{ models | length }} models ·
+    {% if suite == "golden" %}
+      each answer is grounded in retrieved context and graded by an LLM judge against a reference answer.
+    {% else %}
+      no retrieved context; each answer is graded by an LLM judge against a behavior rule.
+    {% endif %}
+  </p>
 
   <div class="card">
-    <canvas id="leaderboardChart" height="90"></canvas>
+    <div class="chart-head">
+      <h2>At a glance</h2>
+      <div class="legend" id="chartLegend"></div>
+    </div>
+    <div class="panels" id="chartPanels"></div>
   </div>
 
   <div class="card">
-    <h2 style="margin-top:0;">Leaderboard</h2>
+    <h2>Leaderboard</h2>
+    <div class="table-wrap">
     <table>
       <thead>
         <tr>
           <th>Model</th>
           {% if suite == "golden" %}
-            <th>Avg Accuracy</th><th>Correct %</th><th>Avg Faithfulness</th><th>Avg Empathy</th>
+            <th>Avg Accuracy</th><th>Correct %</th><th>Avg Faithfulness</th><th>Hallucination %</th><th>Avg Empathy</th>
           {% else %}
             <th>Compliance %</th><th>Uncertainty Ack %</th>
           {% endif %}
@@ -24,79 +51,287 @@
       <tbody>
         {% for entry in board %}
         <tr>
-          <td>{{ entry.model }}</td>
+          <td><strong>{{ entry.model }}</strong></td>
           {% if suite == "golden" %}
-            <td>{{ entry.avg_accuracy }}</td><td>{{ entry.correct_pct }}</td>
-            <td>{{ entry.avg_faithfulness }}</td><td>{{ entry.avg_empathy }}</td>
+            <td>{{ entry.avg_accuracy }}</td><td>{{ pct(entry.correct_pct) }}</td>
+            <td>{{ entry.avg_faithfulness }}</td><td>{{ pct(entry.hallucination_pct) }}</td>
+            <td>{{ entry.avg_empathy }}</td>
           {% else %}
-            <td>{{ entry.compliance_pct }}</td><td>{{ entry.uncertainty_ack_pct }}</td>
+            <td>{{ pct(entry.compliance_pct) }}</td><td>{{ pct(entry.uncertainty_ack_pct) }}</td>
           {% endif %}
-          <td>{{ entry.avg_latency_s }}</td><td>{{ entry.total_cost_usd }}</td>
+          <td>{{ entry.avg_latency_s }}</td><td>{{ '%.4f' | format(entry.total_cost_usd) }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+    </div>
+    {% if suite == "golden" %}
+      <p class="muted small">
+        Correct % counts answers with accuracy ≥ 4. Hallucination % is the share of answers with at least one
+        claim the retrieved context doesn't support. Cost covers the models under test, not the judge.
+      </p>
+    {% endif %}
   </div>
 
-  <div class="card">
-    <h2 style="margin-top:0;">Per-question results</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Model</th><th>Question</th>
-          {% if suite == "golden" %}
-            <th>Accuracy</th><th>Faithfulness</th><th>Empathy</th>
-          {% else %}
-            <th>Compliant</th><th>Ack. Uncertainty</th>
-          {% endif %}
-          <th>Latency (s)</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in rows %}
-        <tr>
-          <td>{{ row['model_name'] }}</td>
-          <td class="muted">{{ row['question'] }}</td>
-          {% if suite == "golden" %}
-            <td>{{ row['accuracy_score'] }}</td>
-            <td>{{ row['faithfulness_score'] if row['faithfulness_score'] is not none else '—' }}</td>
-            <td>{{ row['empathy_score'] }}</td>
-          {% else %}
-            <td>{{ 'yes' if row['no_rag_compliant'] else 'no' }}</td>
-            <td>{{ 'yes' if row['acknowledged_uncertainty'] else 'no' }}</td>
-          {% endif %}
-          <td>{{ '%.2f'|format(row['latency_s']) if row['latency_s'] is not none else '—' }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="section-head">
+    <h2>Question-by-question results</h2>
+    <div>
+      <button type="button" class="btn" data-toggle-all="open">Expand all</button>
+      <button type="button" class="btn" data-toggle-all="close">Collapse all</button>
+    </div>
   </div>
+
+  {% for q in questions %}
+  <details class="card question" id="{{ q.id }}">
+    <summary>
+      <span class="qid">{{ q.id }}</span>
+      <span class="qtext">{{ q.question }}</span>
+      <span class="qscores">
+        {% for r in q.responses %}
+          {% if suite == "golden" %}
+            {% set n_claims = r.unsupported_claims | length %}
+            {% set chip = score_class(r.accuracy_score, 4, 3) %}
+            <span class="metric {{ 'warn' if chip == 'good' and n_claims else chip }}" title="Accuracy {{ r.accuracy_score }}/5, {{ n_claims }} unsupported claim(s)">
+              {{ r.model }} · {{ r.accuracy_score | int if r.accuracy_score is not none else '—' }}/5{% if n_claims %} · {{ n_claims }} unsupported{% endif %}
+            </span>
+          {% else %}
+            {% set hedged = r.acknowledged_uncertainty == 1 %}
+            {% set chip = 'na' if r.no_rag_compliant is none else ('bad' if r.no_rag_compliant != 1 else ('good' if hedged else 'warn')) %}
+            <span class="metric {{ chip }}" title="{{ 'Compliant' if r.no_rag_compliant == 1 else 'Not compliant' }}; {{ 'acknowledged' if hedged else 'did not acknowledge' }} uncertainty">
+              {{ r.model }} · {{ 'compliant' if r.no_rag_compliant == 1 else 'not compliant' }}{% if not hedged %} · no uncertainty ack{% endif %}
+            </span>
+          {% endif %}
+        {% endfor %}
+      </span>
+    </summary>
+
+    <div class="question-body">
+      <p class="category">{{ (q.category or '') | replace('_', ' ') }}</p>
+
+      <div class="ground-truth">
+        <h3>Graded against</h3>
+        {% if suite == "golden" %}
+          {% if q.reference_answer %}
+            <p class="label">Reference answer</p>
+            <p>{{ q.reference_answer }}</p>
+          {% else %}
+            <p class="muted">No reference answer was recorded for this run.</p>
+          {% endif %}
+          {% if q.context %}
+            <p class="label">Retrieved context given to the model (faithfulness is judged against this)</p>
+            <ul class="context">
+              {% for passage in q.context %}<li>{{ passage }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        {% else %}
+          {% set rule = q.expected_behavior %}
+          {% if rule %}
+            <p class="label">Acceptable behaviors (at least one)</p>
+            <ul>{% for b in rule.acceptable_behaviors %}<li>{{ b }}</li>{% endfor %}</ul>
+            {% if rule.forbidden_behaviors %}
+              <p class="label">Forbidden behaviors</p>
+              <ul class="forbidden">{% for b in rule.forbidden_behaviors %}<li>{{ b }}</li>{% endfor %}</ul>
+            {% endif %}
+            <p class="label">Must acknowledge uncertainty: <strong>{{ 'yes' if rule.must_acknowledge_uncertainty else 'no' }}</strong></p>
+          {% else %}
+            <p class="muted">No behavior rule was recorded for this run.</p>
+          {% endif %}
+        {% endif %}
+      </div>
+
+      <div class="responses">
+        {% for r in q.responses %}
+        <div class="response">
+          <div class="response-head">
+            <h3>{{ r.model }}</h3>
+            <span class="muted small">
+              {{ '%.2f' | format(r.latency_s) if r.latency_s is not none else '—' }}s ·
+              {{ r.prompt_tokens }} → {{ r.completion_tokens }} tokens ·
+              ${{ '%.4f' | format(r.cost_usd) if r.cost_usd is not none else '—' }}
+            </span>
+          </div>
+
+          <div class="metrics">
+            {% if suite == "golden" %}
+              <span class="metric {{ score_class(r.accuracy_score, 4, 3) }}">Accuracy {{ r.accuracy_score | int if r.accuracy_score is not none else '—' }}/5</span>
+              <span class="metric {{ score_class(r.faithfulness_score, 0.9, 0.7) }}">Faithfulness {{ r.faithfulness_score if r.faithfulness_score is not none else '—' }}</span>
+              <span class="metric {{ score_class(r.empathy_score, 4, 3) }}">Empathy {{ r.empathy_score | int if r.empathy_score is not none else '—' }}/5</span>
+            {% else %}
+              <span class="metric-label">Compliant</span> {{ flag(r.no_rag_compliant) }}
+              <span class="metric-label">Acknowledged uncertainty</span> {{ flag(r.acknowledged_uncertainty) }}
+            {% endif %}
+          </div>
+
+          <div class="answer">{{ r.answer_html }}</div>
+
+          {% if r.unsupported_claims %}
+            <div class="claims">
+              <p class="label">Unsupported claims (not in the retrieved context)</p>
+              <ul>{% for claim in r.unsupported_claims %}<li>{{ claim }}</li>{% endfor %}</ul>
+            </div>
+          {% endif %}
+
+          {% if r.rationale %}
+            <div class="rationale">
+              <p class="label">Judge's reasoning</p>
+              <dl>
+                {% for metric, text in r.rationale.items() %}
+                  <dt>{{ metric }}</dt><dd>{{ text }}</dd>
+                {% endfor %}
+              </dl>
+            </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </details>
+  {% endfor %}
 
   <script src="/static/chart.umd.min.js"></script>
   <script>
+    document.querySelectorAll("[data-toggle-all]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const open = btn.dataset.toggleAll === "open";
+        document.querySelectorAll("details.question").forEach(d => { d.open = open; });
+      });
+    });
+    // Open the question linked in the URL hash, e.g. /runs/x#g04
+    if (location.hash) {
+      const target = document.getElementById(location.hash.slice(1));
+      if (target && target.tagName === "DETAILS") target.open = true;
+    }
+
     const board = {{ board | tojson }};
     const suite = {{ suite | tojson }};
-    const labels = board.map(e => e.model);
-    const datasets = suite === "golden"
-      ? [
-          { label: "Avg Accuracy (1-5)", data: board.map(e => e.avg_accuracy) },
-          { label: "Avg Empathy (1-5)", data: board.map(e => e.avg_empathy) },
-        ]
-      : [
-          { label: "Compliance %", data: board.map(e => e.compliance_pct) },
-        ];
 
-    new Chart(document.getElementById("leaderboardChart"), {
-      type: "bar",
-      data: { labels, datasets },
-      options: {
-        responsive: true,
-        plugins: { legend: { labels: { color: "#e6e8ec" } } },
-        scales: {
-          x: { ticks: { color: "#9aa3b2" }, grid: { color: "#262b36" } },
-          y: { ticks: { color: "#9aa3b2" }, grid: { color: "#262b36" }, beginAtZero: true },
-        },
+    // One small chart per metric: the metrics live on different scales (0-1,
+    // 1-5, %, seconds, dollars), so they never share an axis. Each model keeps
+    // the same color in every panel. Categorical hues in fixed order, stepped
+    // for this dark surface and CVD-validated; models past the eighth fall back
+    // to neutral gray (the axis labels still name every bar).
+    const SERIES = ["#3987e5", "#d95926", "#199e70", "#c98500", "#d55181", "#008300", "#9085e9", "#e66767"];
+    const colorFor = i => SERIES[i] ?? "#6b7280";
+    const TEXT = "#e6e8ec", MUTED = "#9aa3b2", GRID = "#262b36";
+
+    const num = d => v => v.toFixed(d);
+    const PANELS = suite === "golden" ? [
+      { key: "hallucination_pct", title: "Hallucination rate", better: "lower", max: 100, fmt: v => v.toFixed(1) + "%" },
+      { key: "avg_faithfulness", title: "Faithfulness (0-1)", better: "higher", max: 1, fmt: num(3) },
+      { key: "avg_empathy", title: "Empathy (1-5)", better: "higher", max: 5, fmt: num(2) },
+      { key: "avg_accuracy", title: "Accuracy (1-5)", better: "higher", max: 5, fmt: num(2) },
+      { key: "avg_latency_s", title: "Avg latency (s)", better: "lower", fmt: v => v.toFixed(2) + "s" },
+      { key: "total_cost_usd", title: "Total cost", better: "lower", fmt: v => "$" + v.toFixed(4) },
+    ] : [
+      { key: "uncertainty_ack_pct", title: "Acknowledged uncertainty", better: "higher", max: 100, fmt: v => v.toFixed(1) + "%" },
+      { key: "compliance_pct", title: "Rule compliance", better: "higher", max: 100, fmt: v => v.toFixed(1) + "%" },
+      { key: "avg_latency_s", title: "Avg latency (s)", better: "lower", fmt: v => v.toFixed(2) + "s" },
+      { key: "total_cost_usd", title: "Total cost", better: "lower", fmt: v => "$" + v.toFixed(4) },
+    ];
+
+    // Draws each bar's value at its end: outside when it fits, inside otherwise.
+    const valueLabels = {
+      id: "valueLabels",
+      afterDatasetsDraw(chart, _args, opts) {
+        const { ctx, chartArea } = chart;
+        const meta = chart.getDatasetMeta(0);
+        ctx.save();
+        ctx.font = "600 12px -apple-system, 'Segoe UI', Roboto, sans-serif";
+        ctx.textBaseline = "middle";
+        meta.data.forEach((bar, i) => {
+          const value = chart.data.datasets[0].data[i];
+          if (value == null) return;
+          const text = opts.fmt(value);
+          const width = ctx.measureText(text).width;
+          const fitsOutside = bar.x + 6 + width <= chartArea.right;
+          ctx.fillStyle = TEXT;
+          ctx.textAlign = fitsOutside ? "left" : "right";
+          ctx.fillText(text, fitsOutside ? bar.x + 6 : bar.x - 6, bar.y);
+        });
+        ctx.restore();
       },
+    };
+
+    const legend = document.getElementById("chartLegend");
+    board.forEach((entry, i) => {
+      const item = document.createElement("span");
+      item.className = "legend-item";
+      item.innerHTML = `<span class="swatch" style="background:${colorFor(i)}"></span>`;
+      item.append(entry.model);
+      legend.append(item);
+    });
+
+    const container = document.getElementById("chartPanels");
+    // four panels read better as a 2x2 grid than as 3 + an orphan
+    if (PANELS.length === 4) container.style.gridTemplateColumns = "repeat(auto-fill, minmax(min(420px, 100%), 1fr))";
+    PANELS.forEach(panel => {
+      const values = board.map(e => e[panel.key]);
+      if (values.every(v => v == null)) return;
+
+      const el = document.createElement("div");
+      el.className = "panel";
+      el.innerHTML = `<div class="panel-title">${panel.title}<span>${panel.better} is better</span></div>`;
+      const box = document.createElement("div");
+      box.style.height = `${board.length * 34 + 28}px`;
+      box.style.position = "relative";
+      const canvas = document.createElement("canvas");
+      canvas.setAttribute("role", "img");
+      canvas.setAttribute("aria-label", `${panel.title}: ` +
+        board.map((e, i) => `${e.model} ${values[i] == null ? "n/a" : panel.fmt(values[i])}`).join(", "));
+      box.append(canvas);
+      el.append(box);
+      container.append(el);
+
+      const peak = Math.max(...values.filter(v => v != null), 0);
+      new Chart(canvas, {
+        type: "bar",
+        data: {
+          labels: board.map(e => e.model),
+          datasets: [{
+            data: values,
+            backgroundColor: board.map((_, i) => colorFor(i)),
+            hoverBackgroundColor: board.map((_, i) => colorFor(i)),
+            borderRadius: 4,
+            borderSkipped: "start",
+            maxBarThickness: 24,
+            categoryPercentage: 0.8,
+            barPercentage: 0.9,
+          }],
+        },
+        options: {
+          indexAxis: "y",
+          maintainAspectRatio: false,
+          animation: false,
+          layout: { padding: { right: 4 } },
+          plugins: {
+            legend: { display: false },
+            valueLabels: { fmt: panel.fmt },
+            tooltip: {
+              displayColors: false,
+              callbacks: {
+                title: items => items[0].label,
+                label: item => `${panel.title}: ${panel.fmt(item.raw)} (${panel.better} is better)`,
+              },
+            },
+          },
+          scales: {
+            x: {
+              min: 0,
+              // fixed-scale metrics use their full range; open-ended ones get headroom for the value label
+              max: panel.max ?? (peak > 0 ? peak * 1.35 : 1),
+              ticks: { color: MUTED, maxTicksLimit: 5, callback: v => panel.max ? v : "" },
+              grid: { color: GRID },
+              border: { display: false },
+            },
+            y: {
+              ticks: { color: TEXT, font: { size: 12 } },
+              grid: { display: false },
+              border: { color: GRID },
+            },
+          },
+        },
+        plugins: [valueLabels],
+      });
     });
   </script>
 {% endblock %}

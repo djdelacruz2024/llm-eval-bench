@@ -34,7 +34,7 @@ class BenchmarkConfig:
 
     @classmethod
     def from_yaml(cls, path: str | Path) -> "BenchmarkConfig":
-        raw = yaml.safe_load(Path(path).read_text())
+        raw = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
 
         def parse_model(entry: dict) -> ModelConfig:
             known = {"name", "provider", "model_id", "cost_per_1k_prompt_tokens",

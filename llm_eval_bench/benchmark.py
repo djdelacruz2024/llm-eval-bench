@@ -71,6 +71,8 @@ def run_golden_benchmark(
                         question_id=q.id,
                         category=q.category,
                         question=q.question,
+                        reference_answer=q.reference_answer,
+                        context=q.context,
                         answer_text=answer.text,
                         latency_s=answer.latency_s,
                         prompt_tokens=answer.prompt_tokens,
