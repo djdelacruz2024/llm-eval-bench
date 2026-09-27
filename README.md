@@ -197,7 +197,7 @@ pip install -e ".[dev]"
 pytest -q
 ```
 
-The full suite (38 tests) runs offline using the built-in mock provider. It needs no models, network, GPU, or API keys, which makes it CI-friendly. Expect it to finish in a few seconds to under 20 seconds, depending on the machine.
+The full suite (44 tests) runs offline using the built-in mock provider. It needs no models, network, GPU, or API keys, which makes it CI-friendly. Expect it to finish in a few seconds to under 20 seconds, depending on the machine.
 
 ## Tech stack
 

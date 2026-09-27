@@ -40,6 +40,16 @@ class AnthropicProvider(ModelProvider):
     def _get_client(self):
         if self._client is not None:
             return self._client
+
+        # Check the key before importing the SDK: it's configuration the user
+        # always has to supply, and it keeps this check testable without the
+        # optional `anthropic` package installed.
+        api_key = os.environ.get(self.api_key_env)
+        if not api_key:
+            raise ProviderError(
+                f"Set the {self.api_key_env} environment variable with your Anthropic API "
+                f"key to use model '{self.model_id}'."
+            )
         try:
             import anthropic
         except ImportError as exc:
@@ -48,12 +58,6 @@ class AnthropicProvider(ModelProvider):
                 'Install it with `pip install -e ".[anthropic]"`.'
             ) from exc
 
-        api_key = os.environ.get(self.api_key_env)
-        if not api_key:
-            raise ProviderError(
-                f"Set the {self.api_key_env} environment variable with your Anthropic API "
-                f"key to use model '{self.model_id}'."
-            )
         self._client = anthropic.Anthropic(api_key=api_key)
         return self._client
 
